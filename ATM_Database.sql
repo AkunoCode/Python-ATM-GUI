@@ -1,7 +1,7 @@
 -- ATM DATABASE
-CREATE DATABASE atm_system;
+CREATE DATABASE atm_db;
 
-USE atm_system;
+USE atm_db;
 
 CREATE TABLE users(
 	userID VARCHAR(10) PRIMARY KEY,
@@ -24,7 +24,7 @@ CREATE TABLE accounts(
 CREATE TABLE transactions(
 	trans_type VARCHAR(10) NOT NULL,
     amount INT NOT NULL,
-    date_time DATETIME NOT NULL,
+    trans_date DATE NOT NULL,
     account_no INT,
     FOREIGN KEY (account_no) REFERENCES accounts(account_no)
 );

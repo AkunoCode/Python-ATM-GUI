@@ -55,16 +55,7 @@ class ATM_Manager():
     def view_balance(self, account_no):
         """View an account's balance"""
         return self.view_one("accounts", "account_no", account_no)[3]
-    
-    def deposit(self, account_no, amount):
-        """Deposit money into an account"""
-        try:
-            query = f"UPDATE accounts SET balance = balance + {amount} WHERE account_no = {account_no}"
-            self.cursor.execute(query)
-            self.db.commit()
-        except Error as e:
-            print(f"Failed to update record in MySQL table {e}")
-    
+        
     def view_all_transactions(self, account_no):
         """View all transactions of an account"""
         try:
@@ -78,7 +69,7 @@ class ATM_Manager():
     def view_day_transactions(self, account_no):
         """View all transactions of an account within the day"""
         try:
-            query = f"SELECT * FROM transactions WHERE account_no = {account_no} AND date = CURDATE()"
+            query = f"SELECT * FROM transactions WHERE account_no = {account_no} AND trans_date = CURDATE()"
             self.cursor.execute(query)
             result = self.cursor.fetchall()
             return result
@@ -106,18 +97,35 @@ class ATM_Manager():
             return "Amount will exceed withdrawal limit for today."
         else:
             try:
+                # Updating the balance of the account
                 query = f"UPDATE accounts SET balance = balance - {amount} WHERE account_no = {account_no}"
                 self.cursor.execute(query)
                 self.db.commit()
+                
+                # Adding the transaction into the transaction history
+                query = "INSERT INTO transactions (account_no, trans_date, transaction_type, amount) VALUES (%s, CURDATE(), %s, %s)"
+                vars = (account_no, "Withdraw", amount)
+                self.cursor.execute(query, vars)
+                self.db.commit()
+                
                 return "Done"
             except Error as e:
                 print(f"Failed to update record in MySQL table {e}")
     
     def deposit(self, account_no, amount):
-        """Deposit money into an account"""
+        """Deposit money into an account and add into the transaction history"""
         try:
+            # Updating the balance of the account
             query = f"UPDATE accounts SET balance = balance + {amount} WHERE account_no = {account_no}"
             self.cursor.execute(query)
             self.db.commit()
+            
+            # Adding the transaction into the transaction history
+            query = "INSERT INTO transactions (account_no, trans_date, transaction_type, amount) VALUES (%s, CURDATE(), %s, %s)"
+            vars = (account_no, "Deposit", amount)
+            self.cursor.execute(query, vars)
+            self.db.commit()
+            
+            return "Done"
         except Error as e:
             print(f"Failed to update record in MySQL table {e}")       
