@@ -89,7 +89,9 @@ class ATM_Manager():
                 total_withdrawals_freq += 1
 
         # Check if the amount to be withdrawn is within the limit and frequency
-        if total_withdrawals_freq > self.view_account(account_no)[5]:
+        if amount > self.view_account(account_no)[3]:
+            return "Insufficient funds."
+        elif total_withdrawals_freq > self.view_account(account_no)[5]:
             return "Exceeded withdrawal frequency for today."
         elif total_withdrawals_amount > self.view_account(account_no)[4]:
             return "Exceeded withdrawal limit for today."
