@@ -8,7 +8,8 @@ class ATM_GUI(ttk.Window):
         atm_db = ATM_DB()
 
         style = ttk.Style()
-        style.configure('TButton', font=('Berlin Sans FB Demi', 15, 'bold'))
+        style.configure('TButton', font=('Arial', 15, 'bold'))
+        self.resizable(False, False)
 
         # Configure 2x2 grid
         self.columnconfigure(0, weight=1)
@@ -16,17 +17,36 @@ class ATM_GUI(ttk.Window):
         self.rowconfigure(0, weight=1)
         self.rowconfigure(1, weight=3)
 
-        self.create_title_banner().grid(row=0, column=0, columnspan=2, sticky="ew")
+        self.create_title_banner()
         self.info_frame = infoFrame(self)
         self.options_frame = OptionsFrame(self)
 
-        # Loop
         self.mainloop()
+
     
     def create_title_banner(self):
+        """Creates the image banner at the top of the window"""
+        # Image
+        logo_frame = ttk.Frame(self)
+        logo_image = tk.PhotoImage(file="Media/Lion_Icon.png")
+        # Resize
+        logo_image = logo_image.subsample(2,2)
+        logo_label = ttk.Label(logo_frame, image=logo_image)
+        logo_label.image = logo_image
+        logo_label.pack(side="top", anchor='center')
+        logo_frame.grid(row=0, column=0, sticky="ew")
+        
+
+        # Image
         title_frame = ttk.Frame(self)
-        ATM_label = ttk.Label(title_frame, text="Golden Mane ATM", font=("Berlin Sans FB Demi", 30, 'bold'))
-        ATM_label.pack(side="left", padx=20, pady=10, anchor='w')
+        title_image = tk.PhotoImage(file="Media/Golden_Mane_Title.png")
+        # Resize
+        title_image = title_image.subsample(2,2)
+        title_label = ttk.Label(title_frame, image=title_image)
+        title_label.image = title_image
+        title_label.pack(side="top", anchor='center')
+        title_frame.grid(row=0, column=1, sticky="ew")
+
 
         return title_frame
 
@@ -84,36 +104,43 @@ class OptionsFrame(ttk.Frame):
         self.frame.columnconfigure(1, weight=1)
         self.frame.rowconfigure(0, weight=1)
         self.frame.rowconfigure(1, weight=1)
-        self.frame.pack(side="top", padx=10, pady=10, anchor='w', fill='x', expand=True)
+        self.frame.pack(side="top", padx=10, pady=10, anchor='center', fill='x', expand=True)
 
 
         # Buttons - Deposit, Withdraw, View Transactions, Logout
         self.deposit_button = ttk.Button(
             self.frame, text="Deposit",
-            command=lambda : print("Deposit Clicked")
+            bootstyle="primary",
+            command=lambda : print("Deposit Clicked"),
+            width=10,
             )
         self.deposit_button.grid(row=0, column=0, sticky="nsew", padx=10, pady=10,ipady=20)
 
         self.withdraw_button = ttk.Button(
             self.frame, text="Withdraw",
-            command=lambda : print("Withdraw Clicked")
+            bootstyle="primary",
+            command=lambda : print("Withdraw Clicked"),
+            width=10,
             )
         self.withdraw_button.grid(row=0, column=1, sticky="nsew", padx=10, pady=10,ipady=20)
 
         self.transactions_button = ttk.Button(
             self.frame, text="View Transactions",
-            command=lambda : print("View Transactions Clicked")
+            bootstyle="primary",
+            command=lambda : print("View Transactions Clicked"),
+            width=10
             )
         self.transactions_button.grid(row=1, column=0, sticky="nsew", padx=10, pady=10,ipady=20)
         
         self.logout_button = ttk.Button(
             self.frame, text="Logout",
             bootstyle="danger",
-            command=lambda : print("Logout Clicked")
+            command=lambda : print("Logout Clicked"),
+            width=10
             )
         self.logout_button.grid(row=1, column=1, sticky="nsew", padx=10, pady=10,ipady=10)
 
 
 
 if __name__ == "__main__":
-    ATM_GUI("ATM", (800, 400), "atm_theme")
+    ATM_GUI("ATM", (720, 470), "atm_theme")
