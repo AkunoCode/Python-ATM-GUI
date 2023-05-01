@@ -1,11 +1,13 @@
 import tkinter as tk
 import ttkbootstrap as ttk
 from ATM_DB_Manager import ATM_Manager as ATM_DB
+from tkinter import messagebox as msg
 
 class ATM_GUI(ttk.Window):
-    def __init__(self, title, size, theme):
+    def __init__(self, title, size, theme, acc_no):
         super().__init__(title=title, size=size, themename=theme)
-        atm_db = ATM_DB()
+        self.acc_no = acc_no
+        self.atm_db = ATM_DB()
 
         style = ttk.Style()
         style.configure('TButton', font=('Arial', 15, 'bold'))
@@ -47,8 +49,6 @@ class ATM_GUI(ttk.Window):
         title_label.pack(side="top", anchor='center')
         title_frame.grid(row=0, column=1, sticky="ew")
 
-
-        return title_frame
 
 class infoFrame(ttk.Frame):
     def __init__(self, master):
@@ -93,6 +93,7 @@ class infoFrame(ttk.Frame):
 
         return acc_type_frame
 
+
 class OptionsFrame(ttk.Frame):
     def __init__(self, master):
         super().__init__(master)
@@ -111,7 +112,7 @@ class OptionsFrame(ttk.Frame):
         self.deposit_button = ttk.Button(
             self.frame, text="Deposit",
             bootstyle="primary",
-            command=lambda : print("Deposit Clicked"),
+            command= lambda: Deposit_Window(master=self.master),
             width=10,
             )
         self.deposit_button.grid(row=0, column=0, sticky="nsew", padx=10, pady=10,ipady=20)
@@ -135,12 +136,168 @@ class OptionsFrame(ttk.Frame):
         self.logout_button = ttk.Button(
             self.frame, text="Logout",
             bootstyle="danger",
-            command=lambda : print("Logout Clicked"),
+            command= self.master.destroy,
             width=10
             )
         self.logout_button.grid(row=1, column=1, sticky="nsew", padx=10, pady=10,ipady=10)
 
 
+class Deposit_Window(ttk.Toplevel):
+    def __init__(self, master):
+        super().__init__(master)
+        self.title("Deposit")
+        self.geometry("300x500")
+        self.resizable(False, False)
 
+        # Title label
+        self.label = ttk.Label(
+            self,
+            text="Enter Amount to Deposit",
+            font=("Arial", 15, 'bold'),
+            bootstyle='primary'
+            )
+        self.label.pack(side="top", padx=10, pady=10, anchor='center')
+
+        # Create frame
+        self.frame = ttk.Frame(self)
+        self.frame.pack(side="top", padx=10, anchor='center', fill='both', expand=True)
+
+        # Configure a 3x5 grid
+        self.frame.columnconfigure(0, weight=1)
+        self.frame.columnconfigure(1, weight=1)
+        self.frame.columnconfigure(2, weight=1)
+        self.frame.rowconfigure(0, weight=2)
+        self.frame.rowconfigure(1, weight=1)
+        self.frame.rowconfigure(2, weight=1)
+        self.frame.rowconfigure(3, weight=1)
+        self.frame.rowconfigure(4, weight=1)
+
+        # Create widgets
+        self.create_widgets()
+
+        # loop
+        self.mainloop()
+    
+    def create_widgets(self):
+        # entry widget and variable
+        self.entry_var = tk.StringVar()
+        self.entry = ttk.Entry(
+            self.frame,
+            textvariable=self.entry_var,
+            font=("Berlin Sans FB Demi", 15, 'bold'),
+            justify="center"
+            )
+        self.entry.grid(row=0, column=0, columnspan=3, sticky="nsew", padx=10, pady=10,ipady=10)
+
+        # number buttons
+        self.num_1 = ttk.Button(
+            self.frame, text="1",
+            bootstyle="primary",
+            command=lambda : self.entry_var.set(self.entry_var.get() + "1"),
+            width=10,
+            )
+        self.num_1.grid(row=1, column=0, sticky="nsew", padx=10, pady=10,ipady=10)
+
+        self.num_2 = ttk.Button(
+            self.frame, text="2",
+            bootstyle="primary",
+            command=lambda : self.entry_var.set(self.entry_var.get() + "2"),
+            width=10,
+            )
+        self.num_2.grid(row=1, column=1, sticky="nsew", padx=10, pady=10,ipady=10)
+
+        self.num_3 = ttk.Button(
+            self.frame, text="3",
+            bootstyle="primary",
+            command=lambda : self.entry_var.set(self.entry_var.get() + "3"),
+            width=10,
+            )
+        self.num_3.grid(row=1, column=2, sticky="nsew", padx=10, pady=10,ipady=10)
+
+        self.num_4 = ttk.Button(
+            self.frame, text="4",
+            bootstyle="primary",
+            command=lambda : self.entry_var.set(self.entry_var.get() + "4"),
+            width=10,
+            )
+        self.num_4.grid(row=2, column=0, sticky="nsew", padx=10, pady=10,ipady=10)
+
+        self.num_5 = ttk.Button(
+            self.frame, text="5",
+            bootstyle="primary",
+            command=lambda : self.entry_var.set(self.entry_var.get() + "5"),
+            width=10,
+            )
+        self.num_5.grid(row=2, column=1, sticky="nsew", padx=10, pady=10,ipady=10)
+
+        self.num_6 = ttk.Button(
+            self.frame, text="6",
+            bootstyle="primary",
+            command=lambda : self.entry_var.set(self.entry_var.get() + "6"),
+            width=10,
+            )
+        self.num_6.grid(row=2, column=2, sticky="nsew", padx=10, pady=10,ipady=10)
+
+        self.num_7 = ttk.Button(
+            self.frame, text="7",
+            bootstyle="primary",
+            command=lambda : self.entry_var.set(self.entry_var.get() + "7"),
+            width=10,
+            )
+        self.num_7.grid(row=3, column=0, sticky="nsew", padx=10, pady=10,ipady=10)
+
+        self.num_8 = ttk.Button(
+            self.frame, text="8",
+            bootstyle="primary",
+            command=lambda : self.entry_var.set(self.entry_var.get() + "8"),
+            width=10,
+            )
+        self.num_8.grid(row=3, column=1, sticky="nsew", padx=10, pady=10,ipady=10)
+
+        self.num_9 = ttk.Button(
+            self.frame, text="9",
+            bootstyle="primary",
+            command=lambda : self.entry_var.set(self.entry_var.get() + "9"),
+            width=10,
+            )
+        self.num_9.grid(row=3, column=2, sticky="nsew", padx=10, pady=10,ipady=10)
+
+        self.num_0 = ttk.Button(
+            self.frame, text="0",
+            bootstyle="primary",
+            command=lambda : self.entry_var.set(self.entry_var.get() + "0"),
+            width=10,
+            )
+        self.num_0.grid(row=4, column=1, sticky="nsew", padx=10, pady=10,ipady=10)
+
+        # submit button
+        self.submit = ttk.Button(
+            self.frame, text="\u2713",
+            bootstyle="success",
+            command= lambda: self.submit_func(self.master.acc_no, self.entry_var.get()),
+            width=10,
+            )
+        self.submit.grid(row=4, column=0, sticky="nsew", padx=10, pady=10,ipady=10)
+
+        # cancel button
+        self.cancel = ttk.Button(
+            self.frame, text="X",
+            bootstyle="danger",
+            command=lambda: self.destroy(),
+            width=10,
+            )
+        self.cancel.grid(row=4, column=2, sticky="nsew", padx=10, pady=10,ipady=10)
+
+    def submit_func(self, account_number, amount):
+        # Call the deposit method of the atm_db
+        self.master.atm_db.deposit(account_number, amount)
+        
+        # Clear the entry widget
+        self.entry_var.set("")
+
+        # create an ok message box
+        msg.showinfo("Deposit Successful", f"Your new balance is:\n\u20b1{self.master.atm_db.view_balance(account_number)}")
+
+        
 if __name__ == "__main__":
-    ATM_GUI("ATM", (720, 470), "atm_theme")
+    ATM_GUI("ATM", (720, 470), "atm_theme", "1")

@@ -123,7 +123,7 @@ class ATM_Manager():
             self.db.commit()
             
             # Adding the transaction into the transaction history
-            query = "INSERT INTO transactions (account_no, trans_date, transaction_type, amount) VALUES (%s, CURDATE(), %s, %s)"
+            query = "INSERT INTO transactions (account_no, trans_date, trans_type, amount) VALUES (%s, CURDATE(), %s, %s)"
             vars = (account_no, "Deposit", amount)
             self.cursor.execute(query, vars)
             self.db.commit()
