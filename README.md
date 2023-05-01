@@ -2,7 +2,9 @@
   <img src="https://github.com/AkunoCode/Python-ATM-GUI/blob/da8f440ca27fa62d292a05c4ea1e556ce0038cdb/Media/Golden_Mane.png" alt="Golden Mane - CP102 Finals Term Course Outcome Output">
 </p>
 
-This is the final project output for the CP102 course at Manuel S. Enverga University Foundation for the A.Y 2022-2023. The project is named "Golden Mane" and it is a banking/ATM program that utilizes a MySQL database and a tkinter GUI.
+This is a Python program for a banking/ATM system that uses MySQL database with mysql.connector module. The program uses tkinter customized with ttkbootstrap to create an appealing and interactive GUI for the user.
+
+This project is the finals term course outcome requirement for the course "Computer Programming 2" (CP102) in the 2nd semester of academic year 2022-2023 in Manuel S. Enverga University Foundation. The goal of this project is to create a Python program that applies the principles of Object Oriented Paradigm (OOP) to perform CRUD operations in a database using Structured Query Language (SQL) with a Graphical User Interface (GUI) created using Tkiter.
 
 ## Project Details
 
