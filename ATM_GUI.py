@@ -6,9 +6,10 @@ from tkinter import messagebox as msg
 class ATM_GUI(ttk.Window):
     def __init__(self, title, size, theme, acc_no):
         super().__init__(title=title, size=size, themename=theme)
-        self.acc_no = acc_no
         self.atm_db = ATM_DB()
-
+        self.acc_no = acc_no
+        self.userID = self.atm_db.view_account(self.acc_no)[2]
+        
         style = ttk.Style()
         style.configure('TButton', font=('Arial', 15, 'bold'))
         self.resizable(False, False)
@@ -55,17 +56,23 @@ class infoFrame(ttk.Frame):
         super().__init__(master)
         self.grid(row=1, column=0, sticky="ew",)
 
+        self.balance_var = tk.StringVar(value=f"\u20b1{self.master.atm_db.view_balance(self.master.acc_no)}")
+
         # Widgets
         self.create_welcome().pack(side="top",padx=20,pady=10, anchor='w')
         self.create_balance().pack(side="top",padx=20,pady=10, anchor='w')
         self.create_acc_type().pack(side="top",padx=20,pady=10, anchor='w')
-    
+        self.refresh_button = ttk.Button(self,text="Refresh", command=self.refresh).pack(side="top",padx=20,pady=10, anchor='w')
+
+    def refresh(self):
+        self.balance_var.set(f"\u20b1{self.master.atm_db.view_balance(self.master.acc_no)}")
+
     def create_welcome(self):
         welcome_frame = ttk.Frame(self)
         welcome_label = ttk.Label(welcome_frame, text="Welcome", font=("Arial", 15), bootstyle='primary')
         welcome_label.pack(side="top",anchor='w')
 
-        self.user_var = tk.StringVar(value="User")
+        self.user_var = tk.StringVar(value=self.master.atm_db.view_user(f'"{self.master.userID}"')[2])
         user_label = ttk.Label(welcome_frame, text=self.user_var.get(), font=("Berlin Sans FB Demi", 20, 'bold'))
         user_label.pack(side="top",anchor='w')
 
@@ -73,12 +80,11 @@ class infoFrame(ttk.Frame):
     
     def create_balance(self):
         balance_frame = ttk.Frame(self)
-        balance_label = ttk.Label(balance_frame, text="Balance", font=("Arial", 15), bootstyle='primary') 
-        balance_label.pack(side="top",anchor='w')
+        balance_labels = ttk.Label(balance_frame, text="Balance", font=("Arial", 15), bootstyle='primary') 
+        balance_labels.pack(side="top",anchor='w')
 
-        self.balance_var = tk.StringVar(value="0.00")
-        balance_label = ttk.Label(balance_frame, text=f"\u20b1{self.balance_var.get()}", font=("Berlin Sans FB Demi", 20, 'bold'))
-        balance_label.pack(side="top",anchor='w')
+        self.balance_label = ttk.Label(balance_frame, font=("Berlin Sans FB Demi", 20, 'bold'),textvariable=self.balance_var)
+        self.balance_label.pack(side="top",anchor='w')
 
         return balance_frame
     
@@ -87,7 +93,7 @@ class infoFrame(ttk.Frame):
         acc_type_label = ttk.Label(acc_type_frame, text="Account Type", font=("Arial", 15), bootstyle='primary')
         acc_type_label.pack(side="top",anchor='w')
 
-        acc_type_var = tk.StringVar(value="None")
+        acc_type_var = tk.StringVar(value=self.master.atm_db.view_account(self.master.acc_no)[1])
         acc_type_label = ttk.Label(acc_type_frame, text=acc_type_var.get(), font=("Berlin Sans FB Demi", 20, 'bold'))
         acc_type_label.pack(side="top",anchor='w')
 
@@ -298,6 +304,9 @@ class Deposit_Window(ttk.Toplevel):
         # create an ok message box
         msg.showinfo("Deposit Successful", f"Your new balance is:\n\u20b1{self.master.atm_db.view_balance(account_number)}")
 
+        # change the balance in the ATM_GUI
+        self.master.info_frame.create_balance()
+
         
 if __name__ == "__main__":
-    ATM_GUI("ATM", (720, 470), "atm_theme", "1")
+    ATM_GUI("ATM", (720, 500), "atm_theme", "1")
