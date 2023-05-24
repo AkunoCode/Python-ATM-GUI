@@ -134,7 +134,7 @@ class OptionsFrame(ttk.Frame):
         self.transactions_button = ttk.Button(
             self.frame, text="View Transactions",
             bootstyle="primary",
-            command=lambda : print("View Transactions Clicked"),
+            command=lambda : Transactions_Window(master=self),
             width=10
             )
         self.transactions_button.grid(row=1, column=0, sticky="nsew", padx=10, pady=10,ipady=20)
@@ -154,6 +154,7 @@ class Deposit_Window(ttk.Toplevel):
         self.title("Deposit")
         self.geometry("300x500")
         self.resizable(False, False)
+        self.attributes("-topmost", True)
 
         # Title label
         self.label = ttk.Label(
@@ -304,12 +305,14 @@ class Deposit_Window(ttk.Toplevel):
         # create an ok message box
         msg.showinfo("Deposit Successful", f"Your new balance is:\n\u20b1{self.master.atm_db.view_balance(account_number)}")
 
+
 class Withdraw_Window(ttk.Toplevel):
     def __init__(self, master):
         super().__init__(master)
         self.title("Withdraw")
         self.geometry("300x500")
         self.resizable(False, False)
+        self.attributes("-topmost", True)
 
         # Title label
         self.label = ttk.Label(
@@ -463,6 +466,42 @@ class Withdraw_Window(ttk.Toplevel):
         else:
             msg.showerror("Withdrawal Unsuccessful", status)
 
-        
+
+class Transactions_Window(ttk.Toplevel):
+    def __init__(self,master):
+        super().__init__(master)
+        self.title("Transactions")
+        self.geometry("500x400")
+        self.resizable(False, False)
+        self.attributes("-topmost", True)
+
+        # Tkinter Table
+        self.table = ttk.Treeview(self)
+        self.table.pack(side="top", padx=10, pady=10, anchor='center', fill='both', expand=True)
+
+        # define columns
+        self.table['columns'] = ("Transaction Type", "Amount", "Date")
+
+        # format columns
+        self.table.column("#0", width=0, stretch="no")
+        self.table.column("Transaction Type", anchor="center", width=150)
+        self.table.column("Amount", anchor="center", width=150)
+        self.table.column("Date", anchor="center", width=150)
+
+        # create headings
+        self.table.heading("#0", text="", anchor="w") 
+        self.table.heading("Transaction Type", text="Transaction Type", anchor="center")
+        self.table.heading("Amount", text="Amount", anchor="center")
+        self.table.heading("Date", text="Date", anchor="center")
+
+        # insert data
+        id = 0
+        for transaction in self.master.atm_db.view_all_transactions(self.master.acc_no):
+            self.table.insert(parent='', index='end', iid=id, text="", values=(transaction[0], transaction[1], transaction[2]))
+            id += 1
+
+        self.mainloop()
+
+
 if __name__ == "__main__":
     ATM_GUI("ATM", (720, 500), "atm_theme", "1")

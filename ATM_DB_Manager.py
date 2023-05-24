@@ -110,7 +110,7 @@ class ATM_Manager():
                 self.cursor.execute(query, vars)
                 self.db.commit()
                 
-                return ("Done",f"You can withdraw {self.view_account(account_no)[4] - total_withdrawals_amount - amount} more today.")
+                return ("Done",f"You can withdraw {self.view_account(account_no)[5] - total_withdrawals_freq} more today.")
             except Error as e:
                 return (f"Failed to update record in MySQL table {e}")
     
