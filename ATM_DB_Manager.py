@@ -84,19 +84,19 @@ class ATM_Manager():
         total_withdrawals_amount = 0
         total_withdrawals_freq = 0
         for transaction in transactions:
-            if transaction[3] == "Withdraw":
-                total_withdrawals_amount += transaction[4]
+            if transaction[0] == "Withdraw":
+                total_withdrawals_amount += transaction[1]
                 total_withdrawals_freq += 1
 
         # Check if the amount to be withdrawn is within the limit and frequency
-        if amount > self.view_account(account_no)[3]:
+        if amount > int(self.view_account(account_no)[3]):
             return "Insufficient funds."
         elif total_withdrawals_freq > self.view_account(account_no)[5]:
-            return "Exceeded withdrawal frequency for today."
+            return f"Exceeded withdrawal frequency for today. You're only allowed to withdraw {self.view_account(account_no)[5]} times today."
         elif total_withdrawals_amount > self.view_account(account_no)[4]:
-            return "Exceeded withdrawal limit for today."
+            return f"Exceeded withdrawal limit for today. Your withdrawal limit for today is {self.view_account(account_no)[4]}."
         elif total_withdrawals_amount + amount > self.view_account(account_no)[4]:
-            return "Amount will exceed withdrawal limit for today."
+            return f"Amount will exceed withdrawal limit for today. Your withdrawal limit for today is {self.view_account(account_no)[4]}."
         else:
             try:
                 # Updating the balance of the account
@@ -105,14 +105,14 @@ class ATM_Manager():
                 self.db.commit()
                 
                 # Adding the transaction into the transaction history
-                query = "INSERT INTO transactions (account_no, trans_date, transaction_type, amount) VALUES (%s, CURDATE(), %s, %s)"
+                query = "INSERT INTO transactions (account_no, trans_date, trans_type, amount) VALUES (%s, CURDATE(), %s, %s)"
                 vars = (account_no, "Withdraw", amount)
                 self.cursor.execute(query, vars)
                 self.db.commit()
                 
-                return "Done"
+                return ("Done",f"You can withdraw {self.view_account(account_no)[4] - total_withdrawals_amount - amount} more today.")
             except Error as e:
-                print(f"Failed to update record in MySQL table {e}")
+                return (f"Failed to update record in MySQL table {e}")
     
     def deposit(self, account_no, amount):
         """Deposit money into an account and add into the transaction history"""

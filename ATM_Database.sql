@@ -28,3 +28,6 @@ CREATE TABLE transactions(
     account_no INT,
     FOREIGN KEY (account_no) REFERENCES accounts(account_no)
 );
+
+INSERT INTO users VALUES ('Johnleo115','Echevaria','John Leo','Berana Compound, Barangay Bukal, Pagbilao','09563094126');
+INSERT INTO accounts VALUES (NULL,'Savings','Johnleo115',2000,20000,10);
