@@ -30,6 +30,20 @@ class ATM_Manager():
         except Error as e:
             print(f"Failed to insert record into MySQL table {e}")
 
+
+    def register_account(self, userID, userpasswd, balance):
+        """Register a new account to the database"""
+        self.connect()
+        try:
+            query = "INSERT INTO accounts (acctype, userID, balance, withdrawal_limit, withdrawal_freq, userpasswd) VALUES (%s, %s, %s, %s, %s, %s)"
+            vars = ("savings", userID, balance, 20000,10, userpasswd)
+            self.cursor.execute(query, vars)
+            self.db.commit()
+            self.db.close()
+        except Error as e:
+            print(f"Failed to insert record into MySQL table {e}")
+            
+
     def login_account(self, userID, userpasswd):
         """Login an account by checking if the userID and password is correct and return the account number"""
         self.connect()
@@ -47,16 +61,6 @@ class ATM_Manager():
         except Error as e:
             return (False ,f"Failed to select record from MySQL table {e}")
 
-    def register_account(self, account_no, acctype, userID, balance, withdraw_limit, withdraw_freq):
-        """Register a new account to the database"""
-        try:
-            query = "INSERT INTO accounts (account_no, acctype, userID, balance, withdraw_limit, withdraw_freq) VALUES (%s, %s, %s, %s, %s, %s)"
-            vars = (account_no, acctype, userID, balance, withdraw_limit, withdraw_freq)
-            self.cursor.execute(query, vars)
-            self.db.commit()
-            self.db.close()
-        except Error as e:
-            print(f"Failed to insert record into MySQL table {e}")
 
     def view_one(self, table, condition, value):
         """View a record from a table"""
@@ -108,7 +112,6 @@ class ATM_Manager():
 
     def withdraw(self, account_no, amount):
         """Check first if the amount to be withdrawn is within the limit and frequency"""
-        self.connect()
         # Get the transaction history of the account within the day and sum up the withdrawals
         transactions = self.view_day_transactions(account_no)
         total_withdrawals_amount = 0
@@ -128,6 +131,7 @@ class ATM_Manager():
         elif total_withdrawals_amount + amount > self.view_account(account_no)[4]:
             return f"Amount will exceed withdrawal limit for today. Your withdrawal limit for today is {self.view_account(account_no)[4]}."
         else:
+            self.connect()
             try:
                 # Updating the balance of the account
                 query = f"UPDATE accounts SET balance = balance - {amount} WHERE account_no = {account_no}"

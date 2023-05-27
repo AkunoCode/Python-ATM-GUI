@@ -46,11 +46,11 @@ class ATM_Login(ttk.Window):
 
         # Login Button
         self.login_button = ttk.Button(self.button_frame, text="Login", command=lambda: self.login_function(self.userID_var.get(), self.userpassword_var.get()))
-        self.login_button.pack(side="left",padx=20,pady=10, anchor='center', ipadx=10)
+        self.login_button.pack(side="left",padx=20,pady=10, anchor='center', ipadx=10, ipady=10)
 
         # register Button
-        self.register_button = ttk.Button(self.button_frame, text="Register", command=lambda: print("Register"))
-        self.register_button.pack(side="left",padx=20,pady=10, anchor='center')
+        self.register_button = ttk.Button(self.button_frame, text="Register", command=lambda: self.register_function())
+        self.register_button.pack(side="left",padx=20,pady=10, anchor='center', ipady=10)
 
         
         self.mainloop()
@@ -64,9 +64,14 @@ class ATM_Login(ttk.Window):
 
         if self.acc_no[0]:
             self.acc_no = self.acc_no[1]
+            self.iconify()
             ATM_GUI("ATM", (720, 500), self.acc_no)    
         else:
             msg.showerror("Login Failed", self.acc_no[1])
+    
+    def register_function(self):
+        self.iconify()
+        ATM_Register("Register", (700, 700))
 
     def center_window(self):
         window_width = self.size[0]
@@ -78,12 +83,149 @@ class ATM_Login(ttk.Window):
         self.geometry(f"{window_width}x{window_height}+{x}+{y}")    
 
 
+class ATM_Register(ttk.Toplevel):
+    def __init__(self, title, size):
+        super().__init__(title=title, size=size)
+        self.size = size
+        self.center_window()
+        self.resizable(False, False)
+        self.atm_db = ATM_DB()
+
+        title_image = tk.PhotoImage(file="Media/Golden_Mane_Title.png")
+        # Resize
+        title_image = title_image.subsample(2,2)
+        title_label = ttk.Label(self, image=title_image)
+        title_label.image = title_image
+        title_label.pack(side="top", anchor='center')
+
+        body_frame = ttk.Frame(self)
+        body_frame.pack(side="top",padx=10,pady=5, anchor='center')
+
+        user_info_frame = ttk.Frame(body_frame)
+        user_info_frame.pack(side="left",padx=10,pady=5, anchor='center')
+
+        account_info_frame = ttk.Frame(body_frame)
+        account_info_frame.pack(side="right",padx=10,pady=5, anchor='center')
+
+        # Surname Label
+        self.surname_label = ttk.Label(user_info_frame, text="Surname", font=("Arial", 20, 'bold'), bootstyle='primary')
+        self.surname_label.pack(side="top",padx=20,pady=10, anchor='center')
+
+        # Surname Entry
+        self.surname_var = tk.StringVar()
+        self.surname_entry = ttk.Entry(user_info_frame, font=("Berlin Sans FB Demi", 15, 'bold'), justify="center", textvariable=self.surname_var)
+        self.surname_entry.pack(side="top",padx=20,pady=10, anchor='center')
+
+        # First Name Label
+        self.fstname_label = ttk.Label(user_info_frame, text="First Name", font=("Arial", 20, 'bold'), bootstyle='primary')
+        self.fstname_label.pack(side="top",padx=20,pady=10, anchor='center')
+
+        # First Name Entry
+        self.fstname_var = tk.StringVar()
+        self.fstname_entry = ttk.Entry(user_info_frame, font=("Berlin Sans FB Demi", 15, 'bold'), justify="center", textvariable=self.fstname_var)
+        self.fstname_entry.pack(side="top",padx=20,pady=10, anchor='center')
+
+        # Home Address Label
+        self.homeadd_label = ttk.Label(user_info_frame, text="Home Address", font=("Arial", 20, 'bold'), bootstyle='primary')
+        self.homeadd_label.pack(side="top",padx=20,pady=10, anchor='center')
+
+        # Home Address Entry
+        self.homeadd_var = tk.StringVar()
+        self.homeadd_entry = ttk.Entry(user_info_frame, font=("Berlin Sans FB Demi", 15, 'bold'), justify="center", textvariable=self.homeadd_var)
+        self.homeadd_entry.pack(side="top",padx=20,pady=10, anchor='center')
+
+        # Phone Number Label
+        self.phonenum_label = ttk.Label(user_info_frame, text="Phone Number", font=("Arial", 20, 'bold'), bootstyle='primary')
+        self.phonenum_label.pack(side="top",padx=20,pady=10, anchor='center')
+
+        # Phone Number Entry
+        self.phonenum_var = tk.StringVar()
+        self.phonenum_entry = ttk.Entry(user_info_frame, font=("Berlin Sans FB Demi", 15, 'bold'), justify="center", textvariable=self.phonenum_var)
+        self.phonenum_entry.pack(side="top",padx=20,pady=10, anchor='center')
+
+        # UserID Label
+        self.userID_label = ttk.Label(account_info_frame, text="User ID", font=("Arial", 20, 'bold'), bootstyle='primary')
+        self.userID_label.pack(side="top",padx=20,pady=10, anchor='center')
+
+        # UserID Entry
+        self.userID_var = tk.StringVar()
+        self.userID_entry = ttk.Entry(account_info_frame, font=("Berlin Sans FB Demi", 15, 'bold'), justify="center", textvariable=self.userID_var)
+        self.userID_entry.pack(side="top",padx=20,pady=10, anchor='center')
+        
+        # Password Label
+        self.password_label = ttk.Label(account_info_frame, text="Password", font=("Arial", 20, 'bold'), bootstyle='primary')
+        self.password_label.pack(side="top",padx=20,pady=10, anchor='center')
+
+        # Password Entry
+        self.userpassword_var = tk.StringVar()
+        self.password_entry = ttk.Entry(account_info_frame, font=("Berlin Sans FB Demi", 15, 'bold'), justify="center", show="*", textvariable=self.userpassword_var)
+        self.password_entry.pack(side="top",padx=20,pady=10, anchor='center')
+
+        # Initial Deposit Label
+        self.initdep_label = ttk.Label(account_info_frame, text="Initial Deposit", font=("Arial", 20, 'bold'), bootstyle='primary')
+        self.initdep_label.pack(side="top",padx=20,pady=10, anchor='center')
+
+        # Initial Deposit Entry
+        self.initdep_var = tk.StringVar()
+        self.initdep_entry = ttk.Entry(account_info_frame, font=("Berlin Sans FB Demi", 15, 'bold'), justify="center", textvariable=self.initdep_var)
+        self.initdep_entry.pack(side="top",padx=20,pady=10, anchor='center')
+
+        # Submit Label
+        self.submit_label = ttk.Label(account_info_frame, text="Submit?", font=("Arial", 20, 'bold'), bootstyle='primary')
+        self.submit_label.pack(side="top",padx=20,pady=10, anchor='center')
+
+        button_frame = ttk.Frame(account_info_frame)
+        button_frame.pack(side="top",padx=20,pady=10, anchor='center')
+
+        # submit button
+        self.submit = ttk.Button(
+            button_frame,
+            text="\u2713",
+            bootstyle="success",
+            command= lambda: self.submit_func(),
+            width=8,
+            )
+        self.submit.pack(side="left",padx=5,pady=5,)
+
+        # cancel button
+        self.cancel = ttk.Button(
+            button_frame,
+            text="X",
+            bootstyle="danger",
+            command=lambda: self.destroy(),
+            width=10,
+            )
+        self.cancel.pack(side="left", padx=10 ,pady=5, ipadx=10)
+
+        self.mainloop()
+
+    def center_window(self):
+        window_width = self.size[0]
+        window_height = self.size[1]
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+        x = int((screen_width / 2) - (window_width / 2))
+        y = int((screen_height / 2) - (window_height / 2))
+        self.geometry(f"{window_width}x{window_height}+{x}+{y}")  
+    
+    def submit_func(self):
+        """Checks if the entries are valid and submits the data to the database"""
+        # Check if all entries are filled
+        if self.surname_var.get() == "" or self.fstname_var.get() == "" or self.homeadd_var.get() == "" or self.phonenum_var.get() == "" or self.userID_var.get() == "" or self.userpassword_var.get() == "" or self.initdep_var.get() == "":
+            msg.showerror("Invalid Input", "Please fill in all the entries.")
+            return
+        else:
+            # Create user
+            self.atm_db.register_users(self.userID_var.get(), self.surname_var.get(), self.fstname_var.get(), self.homeadd_var.get(), self.phonenum_var.get())
+            # Create account
+            self.atm_db.register_account(self.userID_var.get(), self.userpassword_var.get(), self.initdep_var.get())
+
+
 class ATM_GUI(ttk.Toplevel):
     def __init__(self, title, size, acc_no):
         super().__init__(title=title, size=size)
         self.size = size
         self.center_window()
-        self.attributes("-topmost", True)
         self.atm_db = ATM_DB()
         self.acc_no = acc_no
         self.userID = self.atm_db.view_account(self.acc_no)[2]
@@ -228,11 +370,15 @@ class OptionsFrame(ttk.Frame):
         self.logout_button = ttk.Button(
             self.frame, text="Logout",
             bootstyle="danger",
-            command= self.master.destroy,
+            command= lambda: self.logout(),
             width=10
             )
         self.logout_button.grid(row=1, column=1, sticky="nsew", padx=10, pady=10,ipady=10)
-
+    
+    def logout(self):
+        """Logs out the user destroys the window and deiconifies the login window"""
+        self.master.master.deiconify()
+        self.master.destroy()
 
 class Deposit_Window(ttk.Toplevel):
     def __init__(self, master):
@@ -590,4 +736,4 @@ class Transactions_Window(ttk.Toplevel):
 
 
 if __name__ == "__main__":
-    ATM_Login("Login to your account", (400, 450), "atm_theme")
+    ATM_Login("Login to your account", (400, 480), "atm_theme")
