@@ -6,6 +6,10 @@ class ATM_Manager():
 
     def __init__(self) -> None:
         """Initialize the database connection"""
+        self.connect()
+    
+    def connect(self):
+        """Connect to the database"""
         self.db = mysql.connector.connect(
             host=dbhost,
             user=dbuser,
@@ -16,13 +20,32 @@ class ATM_Manager():
 
     def register_users(self, userID, surname, fstname, homeadd, phonenum):
         """Register a new user to the database"""
+        self.connect()
         try:
             query = "INSERT INTO users (userID, surname, fstname, homeadd, phonenum) VALUES (%s, %s, %s, %s, %s)"
             vars = (userID, surname, fstname, homeadd, phonenum)
             self.cursor.execute(query, vars)
             self.db.commit()
+            self.db.close()
         except Error as e:
             print(f"Failed to insert record into MySQL table {e}")
+
+    def login_account(self, userID, userpasswd):
+        """Login an account by checking if the userID and password is correct and return the account number"""
+        self.connect()
+        try:
+            self.db.commit()
+            query = f"SELECT account_no FROM accounts WHERE userID = %s AND userpasswd = %s"
+            print(query)
+            self.cursor.execute(query, (userID, userpasswd))
+            result = self.cursor.fetchone()
+            self.db.close()
+            if result == None:
+                return (False, "Invalid userID or password.")
+            else:
+                return (True, int(result[0]))
+        except Error as e:
+            return (False ,f"Failed to select record from MySQL table {e}")
 
     def register_account(self, account_no, acctype, userID, balance, withdraw_limit, withdraw_freq):
         """Register a new account to the database"""
@@ -31,15 +54,18 @@ class ATM_Manager():
             vars = (account_no, acctype, userID, balance, withdraw_limit, withdraw_freq)
             self.cursor.execute(query, vars)
             self.db.commit()
+            self.db.close()
         except Error as e:
             print(f"Failed to insert record into MySQL table {e}")
 
     def view_one(self, table, condition, value):
         """View a record from a table"""
+        self.connect()
         try:
             query = f"SELECT * FROM {table} WHERE {condition} = {value}"
             self.cursor.execute(query)
             result = self.cursor.fetchone()
+            self.db.close()
             return result
         except Error as e:
             print(f"Failed to select record from MySQL table {e}")
@@ -58,27 +84,31 @@ class ATM_Manager():
         
     def view_all_transactions(self, account_no):
         """View all transactions of an account"""
+        self.connect()
         try:
             query = f"SELECT * FROM transactions WHERE account_no = {account_no}"
             self.cursor.execute(query)
             result = self.cursor.fetchall()
+            self.db.close()
             return result
         except Error as e:
             print(f"Failed to select record from MySQL table {e}")
     
     def view_day_transactions(self, account_no):
         """View all transactions of an account within the day"""
+        self.connect()
         try:
             query = f"SELECT * FROM transactions WHERE account_no = {account_no} AND trans_date = CURDATE()"
             self.cursor.execute(query)
             result = self.cursor.fetchall()
+            self.db.close()
             return result
         except Error as e:
             print(f"Failed to select record from MySQL table {e}")
 
     def withdraw(self, account_no, amount):
         """Check first if the amount to be withdrawn is within the limit and frequency"""
-        
+        self.connect()
         # Get the transaction history of the account within the day and sum up the withdrawals
         transactions = self.view_day_transactions(account_no)
         total_withdrawals_amount = 0
@@ -109,6 +139,7 @@ class ATM_Manager():
                 vars = (account_no, "Withdraw", amount)
                 self.cursor.execute(query, vars)
                 self.db.commit()
+                self.db.close()
                 
                 return ("Done",f"You can withdraw {self.view_account(account_no)[5] - total_withdrawals_freq} more today.")
             except Error as e:
@@ -116,6 +147,7 @@ class ATM_Manager():
     
     def deposit(self, account_no, amount):
         """Deposit money into an account and add into the transaction history"""
+        self.connect()
         try:
             # Updating the balance of the account
             query = f"UPDATE accounts SET balance = balance + {amount} WHERE account_no = {account_no}"
@@ -127,6 +159,7 @@ class ATM_Manager():
             vars = (account_no, "Deposit", amount)
             self.cursor.execute(query, vars)
             self.db.commit()
+            self.db.close()
             
             return "Done"
         except Error as e:

@@ -3,15 +3,91 @@ import ttkbootstrap as ttk
 from ATM_DB_Manager import ATM_Manager as ATM_DB
 from tkinter import messagebox as msg
 
-class ATM_GUI(ttk.Window):
-    def __init__(self, title, size, theme, acc_no):
+class ATM_Login(ttk.Window):
+    def __init__(self, title, size, theme):
         super().__init__(title=title, size=size, themename=theme)
+        self.size = size
+        self.center_window()
+        self.resizable(False, False)
+        style = ttk.Style()
+        style.configure('TButton', font=('Arial', 15, 'bold'))
+        self.acc_no = None
+
+        self.atm_db = ATM_DB()
+
+        title_image = tk.PhotoImage(file="Media/Golden_Mane_Title.png")
+        # Resize
+        title_image = title_image.subsample(3,3)
+        title_label = ttk.Label(self, image=title_image)
+        title_label.image = title_image
+        title_label.pack(side="top", anchor='center')
+
+        # UserID Label
+        self.userID_label = ttk.Label(self, text="User ID", font=("Arial", 20, 'bold'), bootstyle='primary')
+        self.userID_label.pack(side="top",padx=20,pady=10, anchor='center')
+
+        # UserID Entry
+        self.userID_var = tk.StringVar()
+        self.userID_entry = ttk.Entry(self, font=("Berlin Sans FB Demi", 15, 'bold'), justify="center", textvariable=self.userID_var)
+        self.userID_entry.pack(side="top",padx=20,pady=10, anchor='center')
+
+        # Password Label
+        self.password_label = ttk.Label(self, text="Password", font=("Arial", 20, 'bold'), bootstyle='primary')
+        self.password_label.pack(side="top",padx=20,pady=10, anchor='center')
+
+        # Password Entry
+        self.userpassword_var = tk.StringVar()
+        self.password_entry = ttk.Entry(self, font=("Berlin Sans FB Demi", 15, 'bold'), justify="center", show="*", textvariable=self.userpassword_var)
+        self.password_entry.pack(side="top",padx=20,pady=10, anchor='center')
+
+        # button frame
+        self.button_frame = ttk.Frame(self)
+        self.button_frame.pack(side="top",padx=20,pady=10, anchor='center')
+
+        # Login Button
+        self.login_button = ttk.Button(self.button_frame, text="Login", command=lambda: self.login_function(self.userID_var.get(), self.userpassword_var.get()))
+        self.login_button.pack(side="left",padx=20,pady=10, anchor='center', ipadx=10)
+
+        # register Button
+        self.register_button = ttk.Button(self.button_frame, text="Register", command=lambda: print("Register"))
+        self.register_button.pack(side="left",padx=20,pady=10, anchor='center')
+
+        
+        self.mainloop()
+
+    def login_function(self, user_id, password):
+        self.acc_no = self.atm_db.login_account(user_id, password)
+        
+        # Clear the entry widgets
+        self.userID_var.set("")
+        self.userpassword_var.set("")
+
+        if self.acc_no[0]:
+            self.acc_no = self.acc_no[1]
+            ATM_GUI("ATM", (720, 500), self.acc_no)    
+        else:
+            msg.showerror("Login Failed", self.acc_no[1])
+
+    def center_window(self):
+        window_width = self.size[0]
+        window_height = self.size[1]
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+        x = int((screen_width / 2) - (window_width / 2))
+        y = int((screen_height / 2) - (window_height / 2))
+        self.geometry(f"{window_width}x{window_height}+{x}+{y}")    
+
+
+class ATM_GUI(ttk.Toplevel):
+    def __init__(self, title, size, acc_no):
+        super().__init__(title=title, size=size)
+        self.size = size
+        self.center_window()
+        self.attributes("-topmost", True)
         self.atm_db = ATM_DB()
         self.acc_no = acc_no
         self.userID = self.atm_db.view_account(self.acc_no)[2]
-        
-        style = ttk.Style()
-        style.configure('TButton', font=('Arial', 15, 'bold'))
+
         self.resizable(False, False)
 
         # Configure 2x2 grid
@@ -26,7 +102,15 @@ class ATM_GUI(ttk.Window):
 
         self.mainloop()
 
-    
+    def center_window(self):
+        window_width = self.size[0]
+        window_height = self.size[1]
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+        x = int((screen_width / 2) - (window_width / 2))
+        y = int((screen_height / 2) - (window_height / 2))
+        self.geometry(f"{window_width}x{window_height}+{x}+{y}")  
+
     def create_title_banner(self):
         """Creates the image banner at the top of the window"""
         # Image
@@ -65,6 +149,8 @@ class infoFrame(ttk.Frame):
         self.refresh_button = ttk.Button(self,text="Refresh", command=self.refresh).pack(side="top",padx=20,pady=10, anchor='w')
 
     def refresh(self):
+        """Refreshes the balance label"""
+        print(f"\u20b1{self.master.atm_db.view_balance(self.master.acc_no)}")
         self.balance_var.set(f"\u20b1{self.master.atm_db.view_balance(self.master.acc_no)}")
 
     def create_welcome(self):
@@ -83,7 +169,7 @@ class infoFrame(ttk.Frame):
         balance_labels = ttk.Label(balance_frame, text="Balance", font=("Arial", 15), bootstyle='primary') 
         balance_labels.pack(side="top",anchor='w')
 
-        self.balance_label = ttk.Label(balance_frame, font=("Berlin Sans FB Demi", 20, 'bold'),textvariable=self.balance_var)
+        self.balance_label = ttk.Label(balance_frame, text=self.balance_var ,font=("Berlin Sans FB Demi", 20, 'bold'), textvariable=self.balance_var)
         self.balance_label.pack(side="top",anchor='w')
 
         return balance_frame
@@ -504,4 +590,4 @@ class Transactions_Window(ttk.Toplevel):
 
 
 if __name__ == "__main__":
-    ATM_GUI("ATM", (720, 500), "atm_theme", "1")
+    ATM_Login("Login to your account", (400, 450), "atm_theme")

@@ -18,6 +18,7 @@ CREATE TABLE accounts(
     balance INT NOT NULL,
     withdrawal_limit INT NOT NULL,
     withdrawal_freq INT NOT NULL,
+    userpasswd VARCHAR(255) NOT NULL,
     FOREIGN KEY (userID) REFERENCES users(userID)
 );
 
@@ -30,4 +31,4 @@ CREATE TABLE transactions(
 );
 
 INSERT INTO users VALUES ('Johnleo115','Echevaria','John Leo','Berana Compound, Barangay Bukal, Pagbilao','09563094126');
-INSERT INTO accounts VALUES (NULL,'Savings','Johnleo115',2000,20000,10);
+INSERT INTO accounts VALUES (NULL,'Savings','Johnleo115',2000,20000,10,'Johnleo1152003');
