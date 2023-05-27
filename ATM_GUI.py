@@ -192,7 +192,7 @@ class ATM_Register(ttk.Toplevel):
             button_frame,
             text="X",
             bootstyle="danger",
-            command=lambda: self.destroy(),
+            command=lambda: self.cancel_function(),
             width=10,
             )
         self.cancel.pack(side="left", padx=10 ,pady=5, ipadx=10)
@@ -207,6 +207,11 @@ class ATM_Register(ttk.Toplevel):
         x = int((screen_width / 2) - (window_width / 2))
         y = int((screen_height / 2) - (window_height / 2))
         self.geometry(f"{window_width}x{window_height}+{x}+{y}")  
+
+    def cancel_function(self):
+        """Cancels the registration and destroys the window"""
+        self.master.deiconify()
+        self.destroy()
     
     def submit_func(self):
         """Checks if the entries are valid and submits the data to the database"""
@@ -215,10 +220,18 @@ class ATM_Register(ttk.Toplevel):
             msg.showerror("Invalid Input", "Please fill in all the entries.")
             return
         else:
-            # Create user
-            self.atm_db.register_users(self.userID_var.get(), self.surname_var.get(), self.fstname_var.get(), self.homeadd_var.get(), self.phonenum_var.get())
-            # Create account
-            self.atm_db.register_account(self.userID_var.get(), self.userpassword_var.get(), self.initdep_var.get())
+            # Check if the userID is already taken
+            if self.atm_db.view_user(self.userID_var.get()) != None:
+                msg.showerror("Invalid Input", "User ID is already taken.")
+                return
+            else:
+                # Create user
+                self.atm_db.register_users(self.userID_var.get(), self.surname_var.get(), self.fstname_var.get(), self.homeadd_var.get(), self.phonenum_var.get())
+                # Create account
+                self.atm_db.register_account(self.userID_var.get(), self.userpassword_var.get(), self.initdep_var.get())
+                # Show success message
+                msg.showinfo("Success", "Account successfully created.")
+                self.cancel_function()
 
 
 class ATM_GUI(ttk.Toplevel):
@@ -292,7 +305,6 @@ class infoFrame(ttk.Frame):
 
     def refresh(self):
         """Refreshes the balance label"""
-        print(f"\u20b1{self.master.atm_db.view_balance(self.master.acc_no)}")
         self.balance_var.set(f"\u20b1{self.master.atm_db.view_balance(self.master.acc_no)}")
 
     def create_welcome(self):

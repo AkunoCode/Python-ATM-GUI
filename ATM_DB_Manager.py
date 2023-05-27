@@ -50,7 +50,6 @@ class ATM_Manager():
         try:
             self.db.commit()
             query = f"SELECT account_no FROM accounts WHERE userID = %s AND userpasswd = %s"
-            print(query)
             self.cursor.execute(query, (userID, userpasswd))
             result = self.cursor.fetchone()
             self.db.close()
